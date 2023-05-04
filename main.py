@@ -32,13 +32,16 @@ def load_data():
 
 def list_all_columns(df):
     # Print all column names
-    print("Column Names:")
+    print("List all columns:")
+    print("*****************")
     for col in df.columns:
         print(col)
 
 def drop_columns(df):
     # Prompt user for columns to drop
-    columns_to_drop = input("Enter the column to drop: ").split(",")
+    print("Drop Columns:")
+    print("*************")
+    columns_to_drop = input("Select a column number to Drop from the list: ").split(",")
 
     # Drop specified columns
     df.drop(columns_to_drop, axis=1, inplace=True)
@@ -52,12 +55,17 @@ def describe_columns(df):
     # Describe specified column
     print(df[column_name].describe())
     """
+    print("Describe Columns:")
+    print("*****************")
+    print("Select column number to Describe\n")
     print(df.describe())
 
 
 def search_element_in_column(df):
     # Prompt user for column and element to search for
-    column_name = input("Enter the name of the column to search in: ")
+    print("Search Element in Column:")
+    print("*************************")
+    column_name = input("Select column number to perform a search: \n")
     search_value = input("Enter the value to search for: ")
 
     # Search for element in specified column
@@ -67,12 +75,15 @@ def search_element_in_column(df):
     print(search_result)
 
 # Main program loop
+
 while True:
     # Prompt user for menu choice
     print("Menu:")
     print("1. Load Data")
-    print("2. Manipulate data")
-    print("3. Exit")
+    print("2. Exlopring Data")
+    print("3. Data Analysis")
+    print("4. Print Data Set")
+    print("0. Quit")
 
     choice = input("Enter your choice: ")
 
@@ -82,11 +93,13 @@ while True:
         #read the file first
         #df = read_csv_file()
         # Prompt user for manipulation choice
-        print("Manipulation options:")
+        print("Exploring Data:")
+        print("***************")
         print("1. List all columns")
         print("2. Drop columns")
         print("3. Describe columns")
         print("4. Search element in column")
+        print("0. Back to Main Menu")
 
         option = input("Enter your choice: ")
 
@@ -99,9 +112,24 @@ while True:
             describe_columns(df)
         elif option == "4":
             search_element_in_column(df)
+        elif option == "0":
+            #go back to main menu
+            print("\n...going back to Main Menu...\n")
         else:
             print("Invalid choice. Please try again.")
+
     elif choice == "3":
+        #read the file first
+        #df = read_csv_file()
+        # Prompt user for manipulation choice
+        print("Data Analysis:")
+        print("**************")
+
+        print("Show the total unique count of crimes per year sorted in descending order.")
+
+        print("List the top 5 more dangerous areas for older man (age from 65 and more) in december of 2018 in West LA.")
+
+    elif choice == "0":
         # Exit program
         break
     else:
