@@ -204,8 +204,9 @@ def top_5_dangerous_hours_in_hollywood(df):
 def crime_with_longest_report_time(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
     df['Date Rptd'] = pd.to_datetime(df['Date Rptd'])
-    df['Report Time'] = (df['Date Rptd'] - df['DATE OCC']).astype('timedelta64[h]')
-    longest_report = df.loc[df['Report Time'].idxmax()]
+    df['Report Time'] = (df['Date Rptd'] - df['DATE OCC']).dt.total_seconds() / 3600
+    longest_report_index = df['Report Time'].idxmax()
+    longest_report = df.loc[longest_report_index]
     print(longest_report)
 
 # Task 7: Show the 10 top most common crime types (Crm Cd Desc) overall across all years.
@@ -215,7 +216,7 @@ def top_10_common_crime_types(df):
 
 # Task 8: Are women or men more likely to be the victim of a crime in LA between lunch time (11:00am and 1:00pm)?
 def gender_victim_lunchtime(df):
-    df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
+    df['DATE OCC'] = pd.to_datetime(df['DATE OCC'], format='%m/%d/%Y %I:%M:%S %p')
     df['Hour'] = df['DATE OCC'].dt.hour
     lunchtime_df = df[(df['Hour'] >= 11) & (df['Hour'] <= 13)]
     gender_counts = lunchtime_df['Vict Sex'].value_counts()
@@ -306,17 +307,17 @@ def data_analysis_menu(df):
     while True:
         print("\nData Analysis Menu:")
         print("*********************")
-        print("(1) Show the total unique count of crimes per year sorted in descending order")
-        print("(2) Show the top 5 areas (AREA NAME) with the most crime events in all years")
-        print("(3) Show all months and the unique total count of crimes sorted in increasing order")
-        print("(4) Show the top 10 streets with the most crimes in LA in 2019")
-        print("(5) Show the top 5 most dangerous times (in hours) to be in Hollywood")
-        print("(6) Print the details of the crime that took the most time (in hours) to be reported")
-        print("(7) Show the 10 top most common crime types (Crm Cd Desc) overall across all years")
+        print("(1) Show the total unique count of crimes per year sorted in descending order.")
+        print("(2) Show the top 5 areas (AREA NAME) with the most crime events in all years.")
+        print("(3) Show all months and the unique total count of crimes sorted in increasing order.")
+        print("(4) Show the top 10 streets with the most crimes in LA in 2019.")
+        print("(5) Show the top 5 most dangerous times (in hours) to be in Hollywood.")
+        print("(6) Print the details of the crime that took the most time (in hours) to be reported.")
+        print("(7) Show the 10 top most common crime types (Crm Cd Desc) overall across all years.")
         print("(8) Are women or men more likely to be the victim of a crime in LA between lunch time (11:00am and 1:00pm)?")
         print("(9) What is the month that has the most major credit card frauds in LA in 2019?")
-        print("(10) List the top 5 more dangerous areas for older men (age from 65 and more) in December of 2018")
-        print("(11) Return to Main Menu")
+        print("(10) List the top 5 more dangerous areas for older men (age from 65 and more) in December of 2018.")
+        print("(11) Return to Main Menu.")
         
         try:
             choice = int(input("Please select an option: "))
