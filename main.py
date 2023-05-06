@@ -48,21 +48,56 @@ def drop_columns(df):
 
     print("Columns dropped successfully.")
 
-def describe_columns(df):
-    """# Prompt user for column to describe
-    column_name = input("Enter the name of the column to describe: ")
+def describe_columns():
+    # Read the CSV file and extract column names
+    with open("Crime_Data_from_2017_to_2019.csv") as f:
+        header = f.readline().strip().split(",")
 
-    # Describe specified column
-    print(df[column_name].describe())
-    """
-    print("Describe Columns:")
-    print("*****************")
-    print("Select column number to Describe\n")
-    print(df.describe())
+    # Print available columns and prompt user to select one
+    print("Describe Columns:\n**********************")
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Select column number to Describe:\n")
+    for i, name in enumerate(header):
+        print(f"[{i+1}] {name}")
+    col_num = int(input(f"\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] "))
+
+    # Load column data and calculate statistics
+    start_time = time.time()
+    data = []
+    with open("Crime_Data_from_2017_to_2019.csv") as f:
+        f.readline()
+        for line in f:
+            fields = line.strip().split(",")
+            if len(fields) < col_num:
+                data.append(None)
+            else:
+                data.append(fields[col_num-1])
+
+    count = len(data)
+    unique_count = len(set(data))
+    mean = sum(float(x) for x in data if x is not None) / count
+    median = sorted(float(x) for x in data if x is not None)[count//2]
+    mode = max(set(data), key=data.count)
+    sd = (sum((float(x) - mean)**2 for x in data if x is not None) / count)**0.5
+    variance = sd**2
+    minimum = min(float(x) for x in data if x is not None)
+    maximum = max(float(x) for x in data if x is not None)
+
+    # Print statistics
+    print(f"\nColumn {col_num} stats:\n{'='*15}")
+    print(f"Count: {count}")
+    print(f"Unique: {unique_count}")
+    print(f"Mean: {mean:.2f}")
+    print(f"Median: {median:.2f}")
+    print(f"Mode: {mode}")
+    print(f"Standard Deviation (SD): {sd:.2f}")
+    print(f"Variance: {variance:.2f}")
+    print(f"Minimum: {minimum:.2f}")
+    print(f"Maximum: {maximum:.2f}\n")
+    print(f"Stats printed successfully! Time to process is {time.time()-start_time:.2f} sec.")
 
 
 def search_element_in_column(df):
-    # Prompt user for column and element to search for
+   # Prompt user for column and element to search for
     print("Search Element in Column:")
     print("*************************")
     column_name = input("Select column number to perform a search: \n")
@@ -78,7 +113,7 @@ def search_element_in_column(df):
 
 while True:
     # Prompt user for menu choice
-    print("Menu:")
+    print("\nMain Menu:")
     print("1. Load Data")
     print("2. Exlopring Data")
     print("3. Data Analysis")
@@ -102,14 +137,16 @@ while True:
         print("0. Back to Main Menu")
 
         option = input("Enter your choice: ")
-
+        print("\n")
         # Call the appropriate function based on the user's choice
         if option == "1":
             list_all_columns(df)
         elif option == "2":
             df = drop_columns(df)
         elif option == "3":
-            describe_columns(df)
+            print("Describe Columns:")
+            print("*****************")
+            describe_columns()
         elif option == "4":
             search_element_in_column(df)
         elif option == "0":
@@ -127,7 +164,7 @@ while True:
 
         print("Show the total unique count of crimes per year sorted in descending order.")
 
-        print("List the top 5 more dangerous areas for older man (age from 65 and more) in december of 2018 in West LA.")
+        print("\nList the top 5 more dangerous areas for older man (age from 65 and more) in december of 2018 in West LA.")
 
     elif choice == "0":
         # Exit program
