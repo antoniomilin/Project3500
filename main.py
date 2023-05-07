@@ -6,7 +6,7 @@
 # Student 2: Connor Tennison
 # Student 3: Mariana Lara
 # Student 4: Ryan Gordon
-# description: allows users to load, clean, search, and analyze crime data.
+# description: allows users to load, drop, search, and analyze crime data.
 import pandas as pd
 import time
 
