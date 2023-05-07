@@ -190,14 +190,12 @@ def top_10_streets_in_2019(df):
     print("\nTop 10 streets with the most crimes in LA in 2019 and the total amount of crimes in each street:")
     print(top_streets)
 
-
-
 # Task 5: Show the top 5 most dangerous times (in hours) to be in Hollywood. Also display the total amount of crimes in each hour.
 def top_5_dangerous_hours_in_hollywood(df):
-    hollywood_df = df[df['AREA NAME'] == 'Hollywood'].copy()
-    hollywood_df['DATE OCC'] = pd.to_datetime(hollywood_df['DATE OCC'])
-    hollywood_df['Hour'] = hollywood_df['DATE OCC'].dt.hour
-    dangerous_hours = hollywood_df['Hour'].value_counts().nlargest(5)
+    hollywood_crimes = df[df['AREA NAME'] == 'Hollywood']
+    hollywood_crimes['Hour'] = hollywood_crimes['TIME OCC'].apply(lambda x: int(x // 100))
+    dangerous_hours = hollywood_crimes['Hour'].value_counts().nlargest(5)
+    print("\nThe top 5 most dangerous times (in hours) to be in Hollywood and the total amount of crimes in each hour:")
     print(dangerous_hours)
 
 # Task 6: Print the details of the crime that took the most time (in hours) to be reported.
@@ -216,28 +214,40 @@ def top_10_common_crime_types(df):
 
 # Task 8: Are women or men more likely to be the victim of a crime in LA between lunch time (11:00am and 1:00pm)?
 def gender_victim_lunchtime(df):
-    df['DATE OCC'] = pd.to_datetime(df['DATE OCC'], format='%m/%d/%Y %I:%M:%S %p')
-    df['Hour'] = df['DATE OCC'].dt.hour
-    lunchtime_df = df[(df['Hour'] >= 11) & (df['Hour'] <= 13)]
+    lunchtime_df = df[(df['TIME OCC'] >= 1100) & (df['TIME OCC'] <= 1300)]
     gender_counts = lunchtime_df['Vict Sex'].value_counts()
+    print("Number of male and female victims during lunchtime (11 AM - 1 PM):")
     print(gender_counts)
+
+    if 'M' not in gender_counts:
+        gender_counts['M'] = 0
+    if 'F' not in gender_counts:
+        gender_counts['F'] = 0
+
+    if gender_counts['M'] > gender_counts['F']:
+        print("Male victims are more likely to be targeted during lunchtime.")
+    elif gender_counts['M'] < gender_counts['F']:
+        print("Female victims are more likely to be targeted during lunchtime.")
+    else:
+        print("Men and women are equally likely to be the victim of a crime during lunchtime.")
 
 # Task 9: What is the month that has the most major credit card frauds (Crm Cd Desc = 'CREDIT CARDS, FRAUD USE ($950 & UNDER')) in LA in 2019.
 def most_credit_card_frauds_month_2019(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
-    df['Year'] = df['DATE OCC'].dt.year
+    df['year'] = df['DATE OCC'].dt.year
     df['Month'] = df['DATE OCC'].dt.month
-    credit_card_frauds = df[(df['Year'] == 2019) & (df['Crm Cd Desc'] == 'CREDIT CARDS, FRAUD USE ($950 & UNDER)')]
+    credit_card_frauds = df[(df['year'] == 2019) & (df['Crm Cd Desc'] == 'CREDIT CARDS, FRAUD USE ($950 & UNDER')]
     frauds_by_month = credit_card_frauds['Month'].value_counts().idxmax()
     print("\nMonth with the most major credit card frauds in LA in 2019:")
     print(frauds_by_month)
 
+
 # Task 10: List the top 5 more dangerous areas for older men (age from 65 and more) in December of 2018.
 def top_5_dangerous_areas_older_men_dec_2018(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
-    df['Year'] = df['DATE OCC'].dt.year
+    df['year'] = df['DATE OCC'].dt.year
     df['Month'] = df['DATE OCC'].dt.month
-    older_men_crimes = df[(df['Year'] == 2018) & (df['Month'] == 12) & (df['Vict Sex'] == 'M') & (df['Vict Age'] >= 65)]
+    older_men_crimes = df[(df['year'] == 2018) & (df['Month'] == 12) & (df['Vict Sex'] == 'M') & (df['Vict Age'] >= 65)]
     dangerous_areas = older_men_crimes['AREA NAME'].value_counts().head(5)
     print("\nTop 5 more dangerous areas for older men (age 65 and more) in December of 2018:")
     print(dangerous_areas)
@@ -254,7 +264,11 @@ def main():
         print("(3) Data Analysis")
         print("(4) Print Data Set")
         print("(5) Quit")
-        choice = int(input("Please select an option: "))
+        try:
+            choice = int(input("Please select an option: "))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
 
         if choice == 1:
             load_data()
@@ -277,7 +291,7 @@ def main():
         elif choice == 5:
             break
         else:
-                        print("Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
 
 def exploring_data_menu(df):
     while True:
