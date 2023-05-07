@@ -1,3 +1,12 @@
+# course: CMPS3500
+# CLASS Project
+# PYTHON IMPLEMENTATION: crime data analysis exploration tool
+# date: 05/12/23
+# Student 1: Antonio Millin
+# Student 2: Connor Tennison
+# Student 3: Mariana Lara
+# Student 4: Ryan Gordon
+# description: allows users to load, clean, search, and analyze crime data.
 import pandas as pd
 import time
 
