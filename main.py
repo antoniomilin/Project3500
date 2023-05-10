@@ -263,10 +263,10 @@ def top_10_streets_in_2019(df):
 
 # Task 5: Show the top 5 most dangerous times (in hours) to be in Hollywood. Also display the total amount of crimes in each hour.
 def top_5_dangerous_hours_in_hollywood(df):
-    hollywood_df = df[df['AREA NAME'] == 'Hollywood'].copy()
-    hollywood_df['DATE OCC'] = pd.to_datetime(hollywood_df['DATE OCC'])
-    hollywood_df['Hour'] = hollywood_df['DATE OCC'].dt.hour
-    dangerous_hours = hollywood_df['Hour'].value_counts().nlargest(5)
+    hollywood_crimes = df[df['AREA NAME'] == 'Hollywood']
+    hollywood_crimes['Hour'] = hollywood_crimes['TIME OCC'].apply(lambda x: int(x // 100))
+    dangerous_hours = hollywood_crimes['Hour'].value_counts().nlargest(5)
+    print("\nThe top 5 most dangerous times (in hours) to be in Hollywood and the total amount of crimes in each hour:")
     print(dangerous_hours)
 
 # Task 6: Print the details of the crime that took the most time (in hours) to be reported.
@@ -285,11 +285,22 @@ def top_10_common_crime_types(df):
 
 # Task 8: Are women or men more likely to be the victim of a crime in LA between lunch time (11:00am and 1:00pm)?
 def gender_victim_lunchtime(df):
-    df['DATE OCC'] = pd.to_datetime(df['DATE OCC'], format='%m/%d/%Y %I:%M:%S %p')
-    df['Hour'] = df['DATE OCC'].dt.hour
-    lunchtime_df = df[(df['Hour'] >= 11) & (df['Hour'] <= 13)]
+    lunchtime_df = df[(df['TIME OCC'] >= 1100) & (df['TIME OCC'] <= 1300)]
     gender_counts = lunchtime_df['Vict Sex'].value_counts()
+    print("Number of male and female victims during lunchtime (11 AM - 1 PM):")
     print(gender_counts)
+
+    if 'M' not in gender_counts:
+        gender_counts['M'] = 0
+    if 'F' not in gender_counts:
+        gender_counts['F'] = 0
+
+    if gender_counts['M'] > gender_counts['F']:
+        print("Male victims are more likely to be targeted during lunchtime.")
+    elif gender_counts['M'] < gender_counts['F']:
+        print("Female victims are more likely to be targeted during lunchtime.")
+    else:
+        print("Men and women are equally likely to be the victim of a crime during lunchtime.")
 
 # Task 9: What is the month that has the most major credit card frauds (Crm Cd Desc = 'CREDIT CARDS, FRAUD USE ($950 & UNDER')) in LA in 2019.
 def most_credit_card_frauds_month_2019(df):
@@ -323,7 +334,11 @@ def main():
         print("(3) Data Analysis")
         print("(4) Print Data Set")
         print("(5) Quit")
-        choice = int(input("Please select an option: "))
+        try:
+            choice = int(input("Please select an option: "))
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            continue
 
         if choice == 1:
             load_data()
@@ -357,7 +372,11 @@ def exploring_data_menu(df):
         print("(3) Describe a Column")
         print("(4) Search Element in Column")
         print("(5) Return to Main Menu")
-        choice = int(input("Please select an option: "))
+        try:
+            choice = int(input("Please select an option: "))
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            continue
 
         if choice == 1:
             list_all_columns(df)
