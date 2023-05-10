@@ -294,9 +294,9 @@ def gender_victim_lunchtime(df):
 # Task 9: What is the month that has the most major credit card frauds (Crm Cd Desc = 'CREDIT CARDS, FRAUD USE ($950 & UNDER')) in LA in 2019.
 def most_credit_card_frauds_month_2019(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
-    df['Year'] = df['DATE OCC'].dt.year
+    df['year'] = df['DATE OCC'].dt.year
     df['Month'] = df['DATE OCC'].dt.month
-    credit_card_frauds = df[(df['Year'] == 2019) & (df['Crm Cd Desc'] == 'CREDIT CARDS, FRAUD USE ($950 & UNDER)')]
+    credit_card_frauds = df[(df['year'] == 2019) & (df['Crm Cd Desc'] == 'CREDIT CARDS, FRAUD USE ($950 & UNDER')]
     frauds_by_month = credit_card_frauds['Month'].value_counts().idxmax()
     print("\nMonth with the most major credit card frauds in LA in 2019:")
     print(frauds_by_month)
