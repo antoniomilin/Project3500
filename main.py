@@ -65,54 +65,6 @@ def drop_columns(df):
     else:
         print("Invalid column number. Please try again.")
 
-# Calculate the count of values in a list
-def count(data):
-    return len(data)
-
-# Calculate the unique count of values in a list
-def unique_count(data):
-    return len(set(data))
-
-# Calculate the mean of a list of numerical data
-def mean(data):
-    return sum(data) / len(data)
-
-# Calculate the median of a list of numerical data
-def median(data):
-    sorted_data = sorted(data)
-    n = len(sorted_data)
-    if n % 2 == 0:
-        return (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
-    else:
-        return sorted_data[n // 2]
-
-# Calculate the mode of a list of data
-def mode(data):
-    counts = {}
-    for item in data:
-        if item in counts:
-            counts[item] += 1
-        else:
-            counts[item] = 1
-    return max(counts, key=counts.get)
-
-# Calculate the variance of a list of numerical data
-def variance(data):
-    mean_value = mean(data)
-    return sum((x - mean_value) ** 2 for x in data) / len(data)
-
-# Calculate the standard deviation of a list of numerical data
-def std_dev(data):
-    return variance(data) ** 0.5
-
-# Find the minimum value in a list of numerical data
-def minimum(data):
-    return min(data)
-
-# Find the maximum value in a list of numerical data
-def maximum(data):
-    return max(data)
-
 # Describe a selected column
 def describe_custom(df, col_name):
     start_time = time.time()
@@ -199,18 +151,31 @@ def describe_custom(df, col_name):
 
 def describe_columns(df):
     list_all_columns(df)
-    col_to_describe = int(input("\nSelect column number to describe: "))
-    if 0 < col_to_describe <= len(df.columns):
-        col_name = df.columns[col_to_describe - 1]
-        describe_custom(df, col_name)
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    col_to_describe = input(f"\n{current_time} Select column number to describe: ")
+    
+    if col_to_describe.isnumeric():
+        col_to_describe = int(col_to_describe)
+        
+        if 0 < col_to_describe <= len(df.columns):
+            col_name = df.columns[col_to_describe - 1]
+            describe_custom(df, col_name)
+        else:
+            print("Invalid column number. Please try again.")
     else:
-        print("Invalid column number. Please try again.")
+        print("Invalid column number. Please enter a numeric value.")
+
 
 def search_element_in_column(df):
     list_all_columns(df)
     
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    col_to_search = int(input(f"\n{current_time} Select column number to perform a search: "))
+    
+    try:
+        col_to_search = int(input(f"\n{current_time} Select column number to perform a search: "))
+    except ValueError:
+        print("Invalid option. Please enter a valid column number.")
+        return
     
     if 0 < col_to_search <= len(df.columns):
         col_name = df.columns[col_to_search - 1]
@@ -229,6 +194,7 @@ def search_element_in_column(df):
         print(f"\nSearch was successful! Time to search was {processing_time:.2f} sec.")
     else:
         print("Invalid column number. Please try again.")
+
 
 # Analysis functions
 # Task 1: Show the total unique count of crimes per year sorted in descending order.
