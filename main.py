@@ -9,6 +9,7 @@
 # description: allows users to load, drop, search, and analyze crime data.
 import pandas as pd
 import time
+import sys
 
 # Function to load data from CSV files
 def load_data():
@@ -18,29 +19,41 @@ def load_data():
     print("[2] Crime_Data_from_2020_to_2021.csv")
     print("[3] Test.csv")
 
-# Prompt the user to select a file to load
-    file_choice = int(input("Please select an option: "))
-    if file_choice == 1:
-        file_name = 'Crime_Data_from_2017_to_2019.csv'
-    elif file_choice == 2:
-        file_name = 'Crime_Data_from_2020_to_2021.csv'
-    elif file_choice == 3:
-        file_name = 'Test.csv'
-    else:
-        print("Invalid choice. Please try again.")
-        return
-    
-# Read the CSV file and store it in a DataFrame
-    start_time = time.time()
-    df = pd.read_csv(file_name)
-    end_time = time.time()
-    
-    if 'Unnamed: 0' in df.columns:
-        df.drop('Unnamed: 0', axis=1, inplace=True)
+    # Prompt the user to select a file to load
+    while True:
+        try:
+            file_choice = int(input("Please select an option: "))
+            if file_choice == 1:
+                file_name = 'Crime_Data_from_2017_to_2019.csv'
+            elif file_choice == 2:
+                file_name = 'Crime_Data_from_2020_to_2021.csv'
+            elif file_choice == 3:
+                file_name = 'Test.csv'
+            else:
+                print("Invalid choice. Please try again.")
+                continue  # Go back to the beginning of the loop if choice is invalid
+            
+            # Read the CSV file and store it in a DataFrame
+            start_time = time.time()
+            df = pd.read_csv(file_name)
+            end_time = time.time()
 
-    print(f"\nTotal Columns Read: {df.shape[1]}")
-    print(f"Total Rows Read: {df.shape[0]}")
-    print(f"\nFile loaded successfully! Time to load {end_time - start_time:.2f} sec.")
+            if 'Unnamed: 0' in df.columns:
+                df.drop('Unnamed: 0', axis=1, inplace=True)
+
+            print(f"\nTotal Columns Read: {df.shape[1]}")
+            print(f"Total Rows Read: {df.shape[0]}")
+            print(f"\nFile loaded successfully! Time to load {end_time - start_time:.2f} sec.")
+            break  # Exit the loop if file is loaded successfully
+
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+        except FileNotFoundError:
+            print("File not found. Please make sure the file is in the correct directory.")
+        except pd.errors.ParserError:
+            print("Error parsing the CSV file. Please check if the file format is correct.")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
     
 # Function to drop columns with high null values 
 def drop_high_null_columns(df):
@@ -65,6 +78,90 @@ def drop_columns(df):
     else:
         print("Invalid column number. Please try again.")
 
+def count(data):
+    count = 0
+    for value in data:
+        if value is not None:
+            count += 1
+    return count
+
+# Calculate the unique count of values in a list
+def unique_count(data):
+    unique_values = set(data)
+    count = len(unique_values)
+    return count
+
+# Calculate the mean of a list of numerical data
+def mean(data):
+    sum_values = 0
+    count = 0
+    for value in data:
+        if value is not None:
+            sum_values += value
+            count += 1
+    mean = sum_values / count
+    return mean
+
+# Calculate the median of a list of numerical data
+def median(data):
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+    if n % 2 == 0:
+        median = (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
+    else:
+        median = sorted_data[n // 2]
+    return median
+
+# Calculate the mode of a list of data
+def mode(data):
+    frequency = {}
+    for value in data:
+        if value is not None:
+            frequency[value] = frequency.get(value, 0) + 1
+    mode = min(frequency, key=frequency.get)
+    return mode
+
+# Calculate the variance of a list of numerical data
+def variance(data):
+    mean_val = mean(data)
+    squared_diff_sum = 0
+    count = 0
+    for value in data:
+        if value is not None:
+            squared_diff_sum += (value - mean_val) ** 2
+            count += 1
+    variance = squared_diff_sum / count
+    return variance
+
+# Calculate the standard deviation of a list of numerical data
+def std_dev(data):
+    mean_val = mean(data)
+    squared_diff_sum = 0
+    count = 0
+    for value in data:
+        if value is not None:
+            squared_diff_sum += (value - mean_val) ** 2
+            count += 1
+    variance = squared_diff_sum / count
+    sd = variance ** 0.5
+    return sd
+
+# Find the minimum value in a list of numerical data
+def minimum(data):
+    min_value = float('inf')
+    for value in data:
+        if value is not None and value < min_value:
+            min_value = value
+    return min_value
+
+# Find the maximum value in a list of numerical data
+def maximum(data):
+    max_value = float('inf')
+    for value in data:
+        if value is not None and value > max_value:
+            max_value = value
+    return max_value
+
 # Describe a selected column
 def describe_custom(df, col_name):
     start_time = time.time()
@@ -73,77 +170,17 @@ def describe_custom(df, col_name):
         print("The selected column does not contain numerical data.")
         return
 
-    # count
-    count = 0
-    for _ in numerical_data:
-        count += 1
-
-    #unique coutn
-    unique_count = 0
-    unique_values = []
-    for value in numerical_data:
-        if value not in unique_values:
-            unique_values.append(value)
-            unique_count += 1
-    
-    #mean
-    mean = 0
-    for value in numerical_data:
-        mean += value
-    mean /= count
-
-    # median
-    sorted_data = sorted(numerical_data)
-    if count % 2 == 0:
-        median = (sorted_data[count // 2 - 1] + sorted_data[count // 2]) / 2
-    else:
-        median = sorted_data[count // 2]
-
-    #mode section
-    mode = None
-    mode_count = 0
-    for value in unique_values:
-        value_count = 0
-        for data_value in numerical_data:
-            if value == data_value:
-                value_count += 1
-        if value_count > mode_count:
-            mode_count = value_count
-            mode = value
-
-    # stand. deviation
-    deviation_sum = 0
-    for value in numerical_data:
-        deviation_sum += (value - mean) ** 2
-    deviation = (deviation_sum / (count - 1)) ** 0.5
-
-    #variance
-    variance = deviation ** 2
-
-    #min
-    minimum = numerical_data[0]
-    for value in numerical_data:
-        if value < minimum:
-            minimum = value
-    
-    #max
-    maximum = numerical_data[0]
-    for value in numerical_data:
-        if value > maximum:
-            maximum = value
-
-
     print(f"\n{col_name} stats:")
     print("===================")
-    print(f"Count: {count}")
-    print(f"Unique Count: {unique_count}")
-    print(f"Mean: {mean:.2f}")
-    print(f"Median: {median:.2f}")
-    print(f"Mode: {mode}")
-    print(f"Standard Deviation: {deviation:.2f}")
-    print(f"Variance: {variance:.2f}")
-    print(f"Minimum: {minimum}")
-    print(f"Maximum: {maximum}")
+    print(f"Count: {count(numerical_data)}")
+    print(f"Unique Count: {unique_count(numerical_data)}")
+    print(f"Mean: {mean(numerical_data):.2f}")
+    print(f"Median: {median(numerical_data):.2f}")
+    print(f"Mode: {mode(numerical_data)}")
+    print(f"Standard Deviation: {std_dev(numerical_data):.2f}")
+    print(f"Variance: {variance(numerical_data):.2f}")
+    print(f"Minimum: {minimum(numerical_data)}")
+    print(f"Maximum: {maximum(numerical_data)}")
     
     end_time = time.time()
     processing_time = end_time - start_time
@@ -152,8 +189,14 @@ def describe_custom(df, col_name):
 def describe_columns(df):
     list_all_columns(df)
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    col_to_describe = input(f"\n{current_time} Select column number to describe: ")
     
+    #while True:
+        #try:
+    col_to_describe = input(f"\n{current_time} Select column number to describe: ")
+        #except:
+        #print(sys.exc_info()[0], "occured.")
+            #continue
+
     if col_to_describe.isnumeric():
         col_to_describe = int(col_to_describe)
         
@@ -173,16 +216,27 @@ def search_element_in_column(df):
     
     try:
         col_to_search = int(input(f"\n{current_time} Select column number to perform a search: "))
-    except ValueError:
-        print("Invalid option. Please enter a valid column number.")
+    except KeyboardInterrupt:
+        print("\nKeyboard interrupt occurred.")
+        return
+    except Exception as e:
+        print(e, "occured.")
         return
     
     if 0 < col_to_search <= len(df.columns):
         col_name = df.columns[col_to_search - 1]
         
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        search_element = input(f"{current_time} Enter element to search: ")
         
+        try:
+            search_element = input(f"{current_time} Enter element to search: ")
+        except KeyboardInterrupt:
+            print("\nKeyboard interrupt occurred.")
+            return
+        except Exception as e:
+            print(e, "occured.")
+            #continue
+
         start_time = time.time()
         found = df[df[col_name].apply(lambda x: str(x).lower()) == search_element.lower()].index.tolist()
         end_time = time.time()
@@ -302,8 +356,8 @@ def main():
         print("(5) Quit")
         try:
             choice = int(input("Please select an option: "))
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        except:
+            print(sys.exc_info()[0], "occured.")
             continue
 
         if choice == 1:
@@ -327,7 +381,7 @@ def main():
         elif choice == 5:
             break
         else:
-                        print("Invalid option. Please try again.")
+            print("Invalid option. Please try again.")
 
 def exploring_data_menu(df):
     while True:
@@ -340,8 +394,8 @@ def exploring_data_menu(df):
         print("(5) Return to Main Menu")
         try:
             choice = int(input("Please select an option: "))
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        except:
+            print(sys.exc_info()[0], "occured.")
             continue
 
         if choice == 1:
@@ -375,8 +429,8 @@ def data_analysis_menu(df):
         
         try:
             choice = int(input("Please select an option: "))
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        except:
+            print(sys.exc_info()[0], "occured.")
             continue
 
         if choice == 1:
