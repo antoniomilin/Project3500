@@ -10,7 +10,9 @@
 import pandas as pd
 import time
 import sys
+import numpy as np
 
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 # Function to load data from CSV files
 def load_data():
     global df
@@ -48,36 +50,50 @@ def load_data():
 
         except ValueError:
             print("Invalid input. Please enter a number.")
+            break
         except FileNotFoundError:
             print("File not found. Please make sure the file is in the correct directory.")
-        except pd.errors.ParserError:
-            print("Error parsing the CSV file. Please check if the file format is correct.")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-    
-# Function to drop columns with high null values 
+            break
+        #except pd.errors.ParserError:
+        #    print("Error parsing the CSV file. Please check if the file format is correct.")
+        #    break
+
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+# drop columns with a significant number of null values 
 def drop_high_null_columns(df):
     columns_to_drop = ['Crm Cd 2', 'Crm Cd 3', 'Crm Cd 4', 'Cross Street']
     df.drop(columns_to_drop, axis=1, inplace=True)
     print(f"Dropped columns with high null values: {', '.join(columns_to_drop)}")
 
-# Function to list all columns
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+# list all columns
 def list_all_columns(df):
     print("\nColumns in the dataset:")
     for index, col in enumerate(df.columns, start=1):
         print(f"[{index}] {col}")
 
-# Function to drop a specific column
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+# drop user choosen column
 def drop_columns(df):
     list_all_columns(df)
-    col_to_drop = int(input("\nSelect a column number to drop from the list: "))
-    if 0 < col_to_drop <= len(df.columns):
-        col_name = df.columns[col_to_drop - 1]
-        df.drop(col_name, axis=1, inplace=True)
-        print(f"Column [{col_to_drop}] dropped!")
-    else:
-        print("Invalid column number. Please try again.")
+    while True:
+        try:
+            col_to_drop = int(input("\nSelect a column number to drop from the list: "))
+        except:
+            print("\n")
+            print(sys.exc_info()[0], "occured.")
+            continue
 
+        if 0 < col_to_drop <= len(df.columns):
+            col_name = df.columns[col_to_drop - 1]
+            df.drop(col_name, axis=1, inplace=True)
+            print(f"Column [{col_to_drop}] dropped!")
+            break
+        else:
+            print("Invalid column number. Please try again.")
+
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+# sub functions for describe column
 def count(data):
     count = 0
     for value in data:
@@ -115,11 +131,16 @@ def median(data):
 # Calculate the mode of a list of data
 def mode(data):
     frequency = {}
+    max_count = 0
+    mode_value = None
+    
     for value in data:
         if value is not None:
             frequency[value] = frequency.get(value, 0) + 1
-    mode = min(frequency, key=frequency.get)
-    return mode
+            if frequency[value] > max_count:
+                max_count = frequency[value]
+                mode_value = value
+    return mode_value
 
 # Calculate the variance of a list of numerical data
 def variance(data):
@@ -165,7 +186,7 @@ def maximum(data):
 # Describe a selected column
 def describe_custom(df, col_name):
     start_time = time.time()
-    numerical_data = [x for x in df[col_name] if isinstance(x, (int, float))]
+    numerical_data = [x for x in df[col_name] if isinstance(x, (int, float)) and not np.isnan(x)]
     if not numerical_data:
         print("The selected column does not contain numerical data.")
         return
@@ -174,14 +195,16 @@ def describe_custom(df, col_name):
     print("===================")
     print(f"Count: {count(numerical_data)}")
     print(f"Unique Count: {unique_count(numerical_data)}")
-    print(f"Mean: {mean(numerical_data):.2f}")
-    print(f"Median: {median(numerical_data):.2f}")
-    print(f"Mode: {mode(numerical_data)}")
-    print(f"Standard Deviation: {std_dev(numerical_data):.2f}")
-    print(f"Variance: {variance(numerical_data):.2f}")
-    print(f"Minimum: {minimum(numerical_data)}")
-    print(f"Maximum: {maximum(numerical_data)}")
-    
+
+    if numerical_data:  # Check if the list is not empty
+        print(f"Mean: {mean(numerical_data):.2f}")
+        print(f"Median: {median(numerical_data):.2f}")
+        print(f"Mode: {mode(numerical_data)}")
+        print(f"Standard Deviation: {std_dev(numerical_data):.2f}")
+        print(f"Variance: {variance(numerical_data):.2f}")
+        print(f"Minimum: {minimum(numerical_data)}")
+        print(f"Maximum: {maximum(numerical_data)}")
+
     end_time = time.time()
     processing_time = end_time - start_time
     print(f"\nStats printed successfully! Time to process is {processing_time:.2f} sec.")
@@ -190,25 +213,26 @@ def describe_columns(df):
     list_all_columns(df)
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
-    #while True:
-        #try:
-    col_to_describe = input(f"\n{current_time} Select column number to describe: ")
-        #except:
-        #print(sys.exc_info()[0], "occured.")
-            #continue
+    while True:
+        try:
+            col_to_describe = input(f"\n{current_time} Select column number to describe: ")
+        except:
+            print(sys.exc_info()[0], "occured.")
+            continue
 
-    if col_to_describe.isnumeric():
-        col_to_describe = int(col_to_describe)
+        if col_to_describe.isnumeric():
+            col_to_describe = int(col_to_describe)
         
-        if 0 < col_to_describe <= len(df.columns):
-            col_name = df.columns[col_to_describe - 1]
-            describe_custom(df, col_name)
+            if 0 < col_to_describe <= len(df.columns):
+                col_name = df.columns[col_to_describe - 1]
+                describe_custom(df, col_name)
+                break
+            else:
+                print("Invalid column number. Please try again.")
         else:
-            print("Invalid column number. Please try again.")
-    else:
-        print("Invalid column number. Please enter a numeric value.")
+            print("Invalid column number. Please enter a numeric value.")
 
-
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 def search_element_in_column(df):
     list_all_columns(df)
     
@@ -249,7 +273,7 @@ def search_element_in_column(df):
     else:
         print("Invalid column number. Please try again.")
 
-
+# [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 # Analysis functions
 # Task 1: Show the total unique count of crimes per year sorted in descending order.
 def crimes_per_year(df):
@@ -357,6 +381,7 @@ def main():
         try:
             choice = int(input("Please select an option: "))
         except:
+            print("\n")
             print(sys.exc_info()[0], "occured.")
             continue
 
@@ -365,17 +390,17 @@ def main():
             drop_high_null_columns(df)
         elif choice == 2:
             if df is None:
-                print("Please load the data first.")
+                print("\nPlease load the data first.")
                 continue
             exploring_data_menu(df)
         elif choice == 3:
             if df is None:
-                print("Please load the data first.")
+                print("\nPlease load the data first.")
                 continue
             data_analysis_menu(df)
         elif choice == 4:
             if df is None:
-                print("Please load the data first.")
+                print("\nPlease load the data first.")
                 continue
             print_data_set(df)
         elif choice == 5:
@@ -395,6 +420,7 @@ def exploring_data_menu(df):
         try:
             choice = int(input("Please select an option: "))
         except:
+            print("\n")
             print(sys.exc_info()[0], "occured.")
             continue
 
@@ -430,6 +456,7 @@ def data_analysis_menu(df):
         try:
             choice = int(input("Please select an option: "))
         except:
+            print("\n")
             print(sys.exc_info()[0], "occured.")
             continue
 
