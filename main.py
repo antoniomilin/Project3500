@@ -1,6 +1,5 @@
 # course: CMPS3500
-# CLASS Project
-# PYTHON IMPLEMENTATION: crime data analysis exploration tool
+# Class Project Group 2
 # date: 05/12/23
 # Student 1: Antonio Millin
 # Student 2: Connor Tennison
