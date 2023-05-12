@@ -221,6 +221,7 @@ def describe_columns(df):
             if 0 < col_to_describe <= len(df.columns):
                 col_name = df.columns[col_to_describe - 1]
                 describe_custom(df, col_name)
+                break
             else:
                 print("Invalid column number. Please try again.")
         else:
