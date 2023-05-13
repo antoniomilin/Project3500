@@ -1,5 +1,6 @@
 # course: CMPS3500
-# Class Project Group 2
+# CLASS Project
+# PYTHON IMPLEMENTATION: crime data analysis exploration tool
 # date: 05/12/23
 # Student 1: Antonio Millin
 # Student 2: Connor Tennison
@@ -17,7 +18,7 @@ def load_data():
     global df
     print("\nSelect the number of the file to load from the list below:")
     print("[1] Crime_Data_from_2017_to_2019.csv")
-    print("[2] Crime_Data_from_2020_to_2021.csv")
+    print("[2] Crime_Data_presentation.csv")
     print("[3] Test.csv")
 
     # Prompt the user to select a file to load
@@ -27,7 +28,7 @@ def load_data():
             if file_choice == 1:
                 file_name = 'Crime_Data_from_2017_to_2019.csv'
             elif file_choice == 2:
-                file_name = 'Crime_Data_from_2020_to_2021.csv'
+                file_name = 'Crime_Data_presentation.csv'
             elif file_choice == 3:
                 file_name = 'Test.csv'
             else:
@@ -47,15 +48,10 @@ def load_data():
             print(f"\nFile loaded successfully! Time to load {end_time - start_time:.2f} sec.")
             break  # Exit the loop if file is loaded successfully
 
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-            break
-        except FileNotFoundError:
-            print("File not found. Please make sure the file is in the correct directory.")
-            break
-        #except pd.errors.ParserError:
-        #    print("Error parsing the CSV file. Please check if the file format is correct.")
-        #    break
+        except:
+            print("\n")
+            print(sys.exc_info()[0], "occured.")
+            continue
 
 # [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 # drop columns with a significant number of null values 
@@ -216,6 +212,7 @@ def describe_columns(df):
         try:
             col_to_describe = input(f"\n{current_time} Select column number to describe: ")
         except:
+            print("\n")
             print(sys.exc_info()[0], "occured.")
             continue
 
@@ -232,45 +229,46 @@ def describe_columns(df):
             print("Invalid column number. Please enter a numeric value.")
 
 # [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+import sys
+
 def search_element_in_column(df):
     list_all_columns(df)
     
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    
-    try:
-        col_to_search = int(input(f"\n{current_time} Select column number to perform a search: "))
-    except KeyboardInterrupt:
-        print("\nKeyboard interrupt occurred.")
-        return
-    except Exception as e:
-        print(e, "occured.")
-        return
-    
-    if 0 < col_to_search <= len(df.columns):
-        col_name = df.columns[col_to_search - 1]
-        
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        
+    while True:
         try:
-            search_element = input(f"{current_time} Enter element to search: ")
-        except KeyboardInterrupt:
-            print("\nKeyboard interrupt occurred.")
-            return
-        except Exception as e:
-            print(e, "occured.")
-            #continue
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            col_to_search = int(input(f"\n{current_time} Select column number to perform a search: "))
+            if 0 < col_to_search <= len(df.columns):
+                break
+            else:
+                print("Invalid column number. Please try again.")
+        except:
+            print("\n")
+            print(sys.exc_info()[0], "occured.")
+            continue
 
-        start_time = time.time()
-        found = df[df[col_name].apply(lambda x: str(x).lower()) == search_element.lower()].index.tolist()
-        end_time = time.time()
-        processing_time = end_time - start_time
-        
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        print(f"{current_time} Element found in {len(found)} rows.")
-        
-        print(f"\nSearch was successful! Time to search was {processing_time:.2f} sec.")
-    else:
-        print("Invalid column number. Please try again.")
+    col_name = df.columns[col_to_search - 1]
+    
+    while True:
+        try:
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            search_element = input(f"{current_time} Enter element to search: ")
+            break
+        except:
+            print("\n")
+            print(sys.exc_info()[0], "occured.")
+            continue
+
+    start_time = time.time()
+    found = df[df[col_name].apply(lambda x: str(x).lower()) == search_element.lower()].index.tolist()
+    end_time = time.time()
+    processing_time = end_time - start_time
+
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    print(f"{current_time} Element found in {len(found)} rows.")
+
+    print(f"\nSearch was successful! Time to search was {processing_time:.2f} sec.")
+
 
 # [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 # Analysis functions
@@ -278,7 +276,7 @@ def search_element_in_column(df):
 def crimes_per_year(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
     df['Year'] = df['DATE OCC'].dt.year
-    crimes_by_year = df['Year'].value_counts().sort_index(ascending=False)
+    crimes_by_year = df['Year'].value_counts().sort_values(ascending=False)
     print(crimes_by_year)
 
 # Task 2: Show the top 5 areas (AREA NAME) with the most crime events in all years (Sorted by the number of crime events)
@@ -291,7 +289,8 @@ def crimes_by_month(df):
     df['DATE OCC'] = pd.to_datetime(df['DATE OCC'])
     df['Month'] = df['DATE OCC'].dt.month
     crimes_by_month = df['Month'].value_counts().sort_index()
-    print(crimes_by_month)
+    sorted_list = crimes_by_month.sort_values()
+    print(sorted_list)
 
 # Task 4: Show the top 10 streets with the most crimes in LA in 2019. Also display the total amount of crimes in each street.
 def top_10_streets_in_2019(df):
